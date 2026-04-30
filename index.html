@@ -113,7 +113,7 @@ const EXPIRE_DAYS = 7;
 
 // LOGIN
 function login(){
-    let input = document.getElementById("pass").value;
+    let input = document.getElementById("pass").value.trim().toLowerCase();
 
     if(input !== PASSWORD){
         document.getElementById("error").innerText = "Password salah!";
