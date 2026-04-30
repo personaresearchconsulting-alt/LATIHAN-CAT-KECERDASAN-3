@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Persona Access</title>
+<title>Akses Tes Kecerdasan</title>
 
 <style>
 body{
     margin:0;
     font-family:Arial, sans-serif;
-    background:#0a0a0a;
+    background:#0b0b0b;
     color:white;
     display:flex;
     justify-content:center;
@@ -25,10 +25,6 @@ body{
     width:340px;
     text-align:center;
     box-shadow:0 15px 40px rgba(0,0,0,0.4);
-}
-
-h3{
-    margin-bottom:10px;
 }
 
 input{
@@ -69,13 +65,14 @@ button{
     font-weight:bold;
 }
 
-.info{
-    font-size:12px;
-    margin-top:10px;
-}
 .error{
     color:red;
     font-size:13px;
+}
+
+.info{
+    font-size:12px;
+    margin-top:10px;
 }
 </style>
 </head>
@@ -86,7 +83,7 @@ button{
 
     <!-- LOGIN -->
     <div id="login">
-        <h3>AKSES TES</h3>
+        <h3>AKSES TES KECERDASAN</h3>
         <input type="password" id="pass" placeholder="Masukkan Password">
         <button onclick="login()">MASUK</button>
         <div id="error" class="error"></div>
@@ -94,12 +91,15 @@ button{
 
     <!-- MENU -->
     <div id="menu" class="menu">
-        <h3>MENU TES</h3>
+        <h3>PILIH TES</h3>
 
-        <a href="bold_2.html">Tes Siluet Kombinasi</a>
-        <a href="emoji_1.html">Tes Simbol Emoji</a>
-        <a href="hewan_jdl.html">Tes Gambar Hilang</a>
-        <a href="kecerdasan_7_hitungan_arahmataangin.html">Tes Arah Mata Angin</a>
+        <a href="kecerdasan_7_hitungan_arahmataangin.html">
+            Tes Arah Mata Angin
+        </a>
+
+        <a href="kecerdasan_2.html">
+            Tes Kecerdasan Logika
+        </a>
 
         <div id="expireInfo" class="info"></div>
     </div>
@@ -108,21 +108,15 @@ button{
 
 <script>
 
-const PASSWORD = "pesona05";
+const PASSWORD = "persona05";
 const EXPIRE_DAYS = 7;
-const MAX_DEVICE = 3;
 
-// ===== LOGIN =====
+// LOGIN
 function login(){
-    let val = document.getElementById("pass").value;
+    let input = document.getElementById("pass").value;
 
-    if(val !== PASSWORD){
+    if(input !== PASSWORD){
         document.getElementById("error").innerText = "Password salah!";
-        return;
-    }
-
-    if(!checkDevice()){
-        document.getElementById("error").innerText = "Device limit tercapai!";
         return;
     }
 
@@ -133,52 +127,33 @@ function login(){
 
     startSession();
 
-    document.getElementById("login").style.display="none";
-    document.getElementById("menu").style.display="flex";
+    localStorage.setItem("LOGIN_OK","true");
+
+    document.getElementById("login").style.display = "none";
+    document.getElementById("menu").style.display = "flex";
 
     showExpire();
 }
 
-// ===== DEVICE LIMIT =====
-function checkDevice(){
-    let devices = JSON.parse(localStorage.getItem("devices") || "[]");
-
-    if(!localStorage.getItem("device_id")){
-        let id = Math.random().toString(36).substring(2);
-
-        if(devices.length >= MAX_DEVICE){
-            return false;
-        }
-
-        devices.push(id);
-        localStorage.setItem("device_id", id);
-        localStorage.setItem("devices", JSON.stringify(devices));
-    }
-
-    return true;
-}
-
-// ===== START SESSION =====
+// SIMPAN WAKTU PERTAMA
 function startSession(){
     if(!localStorage.getItem("start_time")){
         localStorage.setItem("start_time", new Date().getTime());
     }
 }
 
-// ===== EXPIRED =====
+// CEK EXPIRED
 function isExpired(){
     let start = localStorage.getItem("start_time");
     if(!start) return false;
 
     let now = new Date().getTime();
-    let diff = now - start;
-
-    let days = diff / (1000*60*60*24);
+    let days = (now - start) / (1000*60*60*24);
 
     return days > EXPIRE_DAYS;
 }
 
-// ===== SHOW INFO =====
+// TAMPILKAN EXPIRE
 function showExpire(){
     let start = localStorage.getItem("start_time");
     if(!start) return;
