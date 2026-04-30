@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal CAT — Persona Research & Consulting</title>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --accent: #c5a059;
+            --bg: #f8f7f2;
+            --gold: #d4af37;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border-top: 8px solid var(--accent);
+        }
+        .brand h1 { font-size: 24px; color: var(--primary); margin-bottom: 5px; }
+        .brand p { color: var(--gold); font-weight: bold; margin-bottom: 30px; }
+        
+        .menu-list { display: none; margin-top: 20px; text-align: left; }
+        .menu-item {
+            display: block;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .menu-item:hover {
+            background: var(--primary);
+            color: #fff;
+            transform: translateX(10px);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+        .expiry-info {
+            font-size: 11px;
+            color: #888;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="brand">
+        <h1>PORTAL SIMULASI CAT</h1>
+        <p>Persona Research & Consulting</p>
+    </div>
+
+    <!-- Login Section -->
+    <div id="login-box">
+        <input type="password" id="passInput" placeholder="Masukkan Password Akses">
+        <button class="btn" onclick="checkAccess()">MASUK SISTEM</button>
+    </div>
+
+    <!-- Menu Section -->
+    <div id="menu-box" class="menu-list">
+        <h3 style="margin-bottom: 15px; color: var(--primary);">Pilih Modul Tes:</h3>
+        <a href="kecerdasan_1.html" class="menu-item">01. CAT KECERDASAN (VERBAL & NUMERIK)</a>
+        <a href="kecerdasan_4.html" class="menu-item">02. CAT KECERDASAN HOTS (SPASIAL & LOGIKA)</a>
+        <div class="expiry-info">Akses aktif hingga: 1 Februari 2027</div>
+    </div>
+</div>
+
+<script>
+    function checkAccess() {
+        const pass = document.getElementById('passInput').value;
+        const expiryDate = new Date('2027-02-01');
+        const today = new Date();
+
+        if (today > expiryDate) {
+            alert("Masa akses telah berakhir.");
+            return;
+        }
+
+        if (pass === "persona05") {
+            document.getElementById('login-box').style.display = 'none';
+            document.getElementById('menu-box').style.display = 'block';
+        } else {
+            alert("Password salah!");
+        }
+    }
+</script>
+
+</body>
+</html>

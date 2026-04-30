@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="id" oncontextmenu="return false" onselectstart="return false" onkeydown="if(event.ctrlKey && (event.key==='c' || event.key==='u')) return false">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>CAT KECERDASAN — Persona Research & Consulting</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        :root { --primary: #1a1a2e; --accent: #c5a059; --bg: #f8f7f2; --text: #1a1a2e; --success: #27ae60; --danger: #e74c3c; --gold: #d4af37; }
+        * { box-sizing: border-box; -webkit-user-select: none; user-select: none; margin: 0; padding: 0; }
+        body { background: var(--bg); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--text); padding: 10px; line-height: 1.5; }
+        
+        .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-top: 8px solid var(--accent); }
+        
+        /* Branding */
+        .brand { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        .brand h1 { font-size: 24px; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
+        .brand p { font-size: 14px; color: var(--gold); font-weight: bold; letter-spacing: 1px; }
+
+        /* Timer & Info */
+        .timer { font-size: 28px; font-weight: 800; color: var(--danger); text-align: center; margin-bottom: 20px; font-family: 'Courier New', monospace; background: #fff5f5; padding: 10px; border-radius: 8px; border: 1px solid #ffebeb; }
+
+        /* Login */
+        .login-input { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; text-align: center; margin-bottom: 20px; outline: none; transition: 0.3s; }
+        .login-input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(197, 160, 89, 0.2); }
+
+        /* Soal */
+        .q-num { color: var(--accent); font-weight: bold; font-size: 14px; margin-bottom: 8px; }
+        .q-text { font-size: 19px; font-weight: 600; color: var(--primary); margin-bottom: 25px; min-height: 60px; }
+        
+        /* Opsi Jawaban */
+        .opt { display: flex; align-items: center; padding: 15px; margin: 12px 0; border: 2px solid #f0f0f0; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; background: #fff; }
+        .opt:hover { background: #fdfaf0; border-color: var(--accent); transform: translateX(5px); }
+        .opt.selected { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: bold; }
+
+        /* Navigasi Kotak */
+        .nav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 8px; margin: 25px 0; max-height: 180px; overflow-y: auto; padding: 15px; background: #fafafa; border-radius: 10px; border: 1px solid #eee; }
+        .nav-item { height: 40px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s; }
+        .nav-item.active { border: 3px solid var(--primary); transform: scale(1.1); }
+        .nav-item.filled { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+        /* Tombol */
+        .btn { padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 15px; width: 100%; text-transform: uppercase; }
+        .btn-navy { background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(26, 26, 46, 0.3); }
+        .btn-green { background: var(--success); color: #fff; margin-top: 15px; }
+        .btn-navy:hover, .btn-green:hover { filter: brightness(1.2); }
+
+        /* Rekap Pembahasan */
+        .rekap-table { width: 100%; border-collapse: collapse; margin-top: 25px; border-radius: 10px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+        .rekap-table th { background: var(--primary); color: #fff; padding: 15px; text-align: left; }
+        .rekap-table td { border: 1px solid #eee; padding: 15px; vertical-align: top; background: #fff; font-size: 14px; }
+        .exp-box { margin-top: 12px; padding: 12px; background: #f0f7ff; border-left: 5px solid #3498db; font-size: 13px; color: #2c3e50; line-height: 1.4; border-radius: 0 5px 5px 0; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+
+        #result-screen { text-align: center; }
+        .final-score { font-size: 72px; font-weight: 900; color: var(--primary); margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="login-screen">
+        <div class="brand">
+            <h1>CAT KECERDASAN</h1>
+            <p>Persona Research & Consulting</p>
+        </div>
+        <input type="text" id="username" class="login-input" placeholder="Nama Lengkap Calon Siswa">
+        <button class="btn btn-navy" onclick="startTest()">MULAI SIMULASI CAT</button>
+    </div>
+
+    <div id="test-screen" style="display:none;">
+        <div class="timer" id="timer">60:00</div>
+        
+        <div class="q-area">
+            <div id="q-num" class="q-num"></div>
+            <div id="q-text" class="q-text"></div>
+            <div id="options-container"></div>
+        </div>
+        
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn" style="background:#888; color:white;" onclick="changeQ(-1)">KEMBALI</button>
+            <button class="btn btn-navy" onclick="changeQ(1)">LEWATI / LANJUT</button>
+        </div>
+
+        <div class="nav-grid" id="nav-grid"></div>
+        
+        <button class="btn btn-green" style="background:var(--danger);" onclick="confirmFinish()">SELESAI & KIRIM HASIL</button>
+    </div>
+
+    <div id="result-screen" style="display:none;">
+        <div class="brand">
+            <h1>HASIL EVALUASI</h1>
+            <p id="res-name-display"></p>
+        </div>
+        
+        <div class="final-score" id="score-val">0</div>
+        <p style="color:#666; margin-bottom:20px;">Data Anda telah tersimpan di sistem pusat.</p>
+        
+        <button class="btn btn-green" onclick="downloadPDF()">DOWNLOAD LAPORAN HASIL (PDF)</button>
+        
+        <div style="overflow-x:auto; margin-top:30px; text-align:left;">
+            <h3 style="margin-bottom:10px; color:var(--primary);">Analisis Jawaban & Pembahasan:</h3>
+            <table class="rekap-table">
+                <thead>
+                    <tr>
+                        <th width="50">No</th>
+                        <th>Pembahasan Detail</th>
+                        <th width="80">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="review-body"></tbody>
+            </table>
+        </div>
+        
+        <button class="btn btn-navy" onclick="location.reload()" style="margin-top:30px;">KEMBALI KE BERANDA</button>
+    </div>
+</div>
+
+<script>
+    /* --- DATA SOAL (TEMPEL HASIL GENERATE DI SINI) --- */
+    const quizData = [
+    // === BAGIAN 1: VERBAL (SINONIM & ANTONIM) - 30 SOAL ===
+    { "q": "Sinonim dari 'PROGRESIF' adalah...", "opts": ["Stagnan", "Bertahap", "Maju", "Lambat", "Tradisional"], "ans": "Maju", "exp": "Progresif berarti bergerak maju atau mengalami kemajuan secara berkelanjutan." },
+    { "q": "Antonim dari 'OTODIDAK' adalah...", "opts": ["Mandiri", "Terbimbing", "Cerdas", "Berbakat", "Ahli"], "ans": "Terbimbing", "exp": "Otodidak adalah belajar sendiri; lawannya adalah terbimbing (belajar dengan arahan guru)." },
+    { "q": "Sinonim 'REKONSILIASI' adalah...", "opts": ["Perpecahan", "Perdamaian", "Persaingan", "Perdebatan", "Perpisahan"], "ans": "Perdamaian", "exp": "Rekonsiliasi adalah pemulihan hubungan persahabatan ke keadaan semula atau perdamaian." },
+    { "q": "Antonim 'KONVERGEN' adalah...", "opts": ["Menyatu", "Berbeda", "Divergen", "Seragam", "Fokus"], "ans": "Divergen", "exp": "Konvergen artinya memusat, sedangkan Divergen artinya memencar/menyebar." },
+    { "q": "Sinonim 'DIKOTOMI' adalah...", "opts": ["Penyatuan", "Pembagian dua", "Kekuatan", "Kesamaan", "Perluasan"], "ans": "Pembagian dua", "exp": "Dikotomi adalah pembagian atas dua kelompok yang saling bertentangan." },
+    { "q": "Antonim 'EMPIRIS' adalah...", "opts": ["Teoretis", "Faktual", "Nyata", "Praktis", "Ilmiah"], "ans": "Teoretis", "exp": "Empiris berdasarkan pengalaman nyata; lawannya adalah teoretis (berdasarkan teori/dugaan)." },
+    { "q": "Sinonim 'STAGNASI' adalah...", "opts": ["Kemajuan", "Kemerosotan", "Berhenti", "Kelancaran", "Pertumbuhan"], "ans": "Berhenti", "exp": "Stagnasi adalah keadaan terhenti atau tidak adanya perkembangan." },
+    { "q": "Antonim 'MODERN' adalah...", "opts": ["Canggih", "Kuno", "Baru", "Mutakhir", "Efisien"], "ans": "Kuno", "exp": "Modern adalah terbaru/masa kini; lawannya adalah kuno/arkais." },
+    { "q": "Sinonim 'ITERASI' adalah...", "opts": ["Pengurangan", "Perulangan", "Penghapusan", "Pembagian", "Perencanaan"], "ans": "Perulangan", "exp": "Iterasi adalah proses perulangan dalam mencapai suatu tujuan." },
+    { "q": "Antonim 'PROTAGONIS' adalah...", "opts": ["Utama", "Antagonis", "Pendukung", "Sampingan", "Netral"], "ans": "Antagonis", "exp": "Protagonis adalah tokoh utama yang baik; lawannya adalah antagonis (penentang)." },
+    { "q": "Sinonim 'KAPITAL' adalah...", "opts": ["Kecil", "Modal", "Hutang", "Bunga", "Rugi"], "ans": "Modal", "exp": "Dalam konteks ekonomi, kapital berarti modal pokok." },
+    { "q": "Antonim 'SPORADIS' adalah...", "opts": ["Jarang", "Sering", "Teratur", "Acak", "Berhenti"], "ans": "Teratur", "exp": "Sporadis terjadi tidak menentu; lawannya adalah teratur atau kontinu." },
+    { "q": "Sinonim 'EKSODUS' adalah...", "opts": ["Masuk", "Pengungsian", "Pertemuan", "Kembali", "Menetap"], "ans": "Pengungsian", "exp": "Eksodus adalah perbuatan meninggalkan tempat asal oleh penduduk secara besar-besaran." },
+    { "q": "Antonim 'SKEPTIS' adalah...", "opts": ["Ragu", "Yakin", "Bingung", "Takut", "Curiga"], "ans": "Yakin", "exp": "Skeptis adalah sikap kurang percaya; lawannya adalah yakin atau percaya diri." },
+    { "q": "Sinonim 'ASUMSI' adalah...", "opts": ["Kenyataan", "Dugaan", "Bukti", "Hasil", "Kesimpulan"], "ans": "Dugaan", "exp": "Asumsi adalah landasan berpikir yang dianggap benar namun masih bersifat dugaan." },
+    { "q": "Antonim 'FISIK' adalah...", "opts": ["Badan", "Metafisika", "Mental", "Nyata", "Kuat"], "ans": "Metafisika", "exp": "Fisik berkaitan dengan materi/tubuh; lawannya adalah metafisika (di luar fisik)." },
+    { "q": "Sinonim 'NOMADIK' adalah...", "opts": ["Menetap", "Berpindah-pindah", "Canggih", "Tertinggal", "Teratur"], "ans": "Berpindah-pindah", "exp": "Nomadik adalah pola hidup yang berpindah-pindah tempat." },
+    { "q": "Antonim 'KOHEREN' adalah...", "opts": ["Berhubungan", "Inkonsisten", "Logis", "Satu", "Rapi"], "ans": "Inkonsisten", "exp": "Koheren adalah berhubungan/konsisten; lawannya adalah inkonsisten." },
+    { "q": "Sinonim 'HIBRIDA' adalah...", "opts": ["Asli", "Cangkokan", "Bibit", "Murni", "Langka"], "ans": "Cangkokan", "exp": "Hibrida adalah hasil persilangan atau cangkokan dari dua jenis berbeda." },
+    { "q": "Antonim 'STABIL' adalah...", "opts": ["Tetap", "Labil", "Kuat", "Kokoh", "Pasti"], "ans": "Labil", "exp": "Stabil artinya tetap/mantap; lawannya adalah labil (mudah berubah)." },
+    { "q": "Sinonim 'BONAFIDE' adalah...", "opts": ["Palsu", "Dapat dipercaya", "Ragu", "Murah", "Bangkrut"], "ans": "Dapat dipercaya", "exp": "Bonafide artinya jujur, tulus, atau dapat dipercaya (perusahaan/orang)." },
+    { "q": "Antonim 'PERMANEN' adalah...", "opts": ["Kekal", "Sementara", "Tetap", "Abadi", "Kuat"], "ans": "Sementara", "exp": "Permanen adalah tetap; lawannya adalah sementara/fana." },
+    { "q": "Sinonim 'KONTRAK' adalah...", "opts": ["Perjanjian", "Pembatalan", "Pelepasan", "Perselisihan", "Penghapusan"], "ans": "Perjanjian", "exp": "Kontrak adalah sewa atau perjanjian tertulis." },
+    { "q": "Antonim 'MAYA' adalah...", "opts": ["Semu", "Nyata", "Gaib", "Palsu", "Internet"], "ans": "Nyata", "exp": "Maya adalah tidak nyata; lawannya adalah nyata/riil." },
+    { "q": "Sinonim 'TELAAH' adalah...", "opts": ["Abaikan", "Kajian", "Lihat", "Baca", "Dengar"], "ans": "Kajian", "exp": "Telaah adalah penyelidikan, pemeriksaan, atau kajian mendalam." },
+    { "q": "Antonim 'SINTESIS' adalah...", "opts": ["Gabungan", "Analisis", "Hasil", "Proses", "Teori"], "ans": "Analisis", "exp": "Sintesis adalah penggabungan; lawannya adalah analisis (penguraian)." },
+    { "q": "Sinonim 'KLARIFIKASI' adalah...", "opts": ["Penjelasan", "Kebingungan", "Pertanyaan", "Rahasia", "Sanggahan"], "ans": "Penjelasan", "exp": "Klarifikasi adalah penjernihan atau penjelasan agar suatu hal menjadi terang." },
+    { "q": "Antonim 'EKSTRINSIK' adalah...", "opts": ["Luar", "Intrinsik", "Bantu", "Utama", "Tambahan"], "ans": "Intrinsik", "exp": "Ekstrinsik berasal dari luar; lawannya adalah intrinsik (dari dalam)." },
+    { "q": "Sinonim 'RESIDU' adalah...", "opts": ["Hasil", "Sisa", "Awal", "Utama", "Banyak"], "ans": "Sisa", "exp": "Residu adalah ampas atau sisa dari suatu proses kimia/fisika." },
+    { "q": "Antonim 'OPTIMIS' adalah...", "opts": ["Yakin", "Pesimis", "Berani", "Kuat", "Semangat"], "ans": "Pesimis", "exp": "Optimis berpengharapan baik; lawannya pesimis (mudah putus asa)." },
+
+    // === BAGIAN 2: NUMERIK (MATEMATIKA & PERSEN) - 30 SOAL ===
+    { "q": "Jika harga sepatu Rp400.000 didiskon 20%, berapa harga yang harus dibayar?", "opts": ["Rp300.000", "Rp320.000", "Rp340.000", "Rp360.000", "Rp380.000"], "ans": "Rp320.000", "exp": "Potongan = 20/100 * 400.000 = 80.000. Bayar = 400.000 - 80.000 = 320.000." },
+    { "q": "Berapakah 15% dari 200.000?", "opts": ["15.000", "20.000", "25.000", "30.000", "35.000"], "ans": "30.000", "exp": "15/100 * 200.000 = 15 * 2.000 = 30.000." },
+    { "q": "Seorang polisi menempuh 120 km dengan kecepatan 60 km/jam. Berapa lama perjalanannya?", "opts": ["1 jam", "2 jam", "3 jam", "1.5 jam", "2.5 jam"], "ans": "2 jam", "exp": "Waktu = Jarak / Kecepatan = 120 / 60 = 2 jam." },
+    { "q": "Jika 5 buku harganya Rp75.000, berapa harga 8 buku?", "opts": ["Rp100.000", "Rp110.000", "Rp120.000", "Rp130.000", "Rp140.000"], "ans": "Rp120.000", "exp": "Harga 1 buku = 75.000 / 5 = 15.000. Harga 8 buku = 15.000 * 8 = 120.000." },
+    { "q": "Hasil dari (25 * 4) + (100 / 5) - 50 = ...", "opts": ["50", "60", "70", "80", "100"], "ans": "70", "exp": "100 + 20 - 50 = 120 - 50 = 70." },
+    { "q": "Berapakah nilai x jika 3x + 15 = 45?", "opts": ["5", "10", "15", "20", "25"], "ans": "10", "exp": "3x = 45 - 15 -> 3x = 30 -> x = 10." },
+    { "q": "Rasio uang Andi dan Budi 3:5. Jika total uang mereka Rp800.000, berapa uang Andi?", "opts": ["Rp200.000", "Rp300.000", "Rp400.000", "Rp500.000", "Rp600.000"], "ans": "Rp300.000", "exp": "Andi = 3/(3+5) * 800.000 = 3/8 * 800.000 = 300.000." },
+    { "q": "Kecepatan 90 km/jam sama dengan ... m/detik.", "opts": ["15", "20", "25", "30", "35"], "ans": "25", "exp": "90 * (1000/3600) = 90000 / 3600 = 25 m/s." },
+    { "q": "Andi menabung Rp2.000.000 dengan bunga 10% per tahun. Berapa tabungannya setelah 1 tahun?", "opts": ["Rp2.100.000", "Rp2.200.000", "Rp2.300.000", "Rp2.400.000", "Rp2.500.000"], "ans": "Rp2.200.000", "exp": "Bunga = 10% * 2jt = 200rb. Total = 2.000.000 + 200.000 = 2.200.000." },
+    { "q": "Sebuah angka jika dikalikan 5 lalu dikurangi 10 hasilnya 40. Angka itu adalah...", "opts": ["8", "9", "10", "11", "12"], "ans": "10", "exp": "5x - 10 = 40 -> 5x = 50 -> x = 10." },
+    { "q": "Berapakah 25% dari 1/2?", "opts": ["1/4", "1/8", "1/6", "1/10", "1/2"], "ans": "1/8", "exp": "25/100 * 1/2 = 1/4 * 1/2 = 1/8." },
+    { "q": "Jika p=4 dan q=3, berapakah p² + q²?", "opts": ["12", "14", "25", "49", "30"], "ans": "25", "exp": "4² + 3² = 16 + 9 = 25." },
+    { "q": "Andi lari 400 meter dalam 80 detik. Berapa kecepatannya (m/s)?", "opts": ["2", "3", "4", "5", "6"], "ans": "5", "exp": "V = Jarak/Waktu = 400 / 80 = 5 m/s." },
+    { "q": "Berapakah 0,75 jika dijadikan persen?", "opts": ["7,5%", "75%", "750%", "0,75%", "70%"], "ans": "75%", "exp": "0,75 * 100% = 75%." },
+    { "q": "Luas persegi dengan sisi 12 cm adalah ... cm².", "opts": ["24", "48", "120", "144", "169"], "ans": "144", "exp": "Luas = Sisi * Sisi = 12 * 12 = 144." },
+    { "q": "1, 4, 9, 16, ... Kelanjutan deret tersebut adalah...", "opts": ["20", "25", "30", "36", "49"], "ans": "25", "exp": "Pola bilangan kuadrat: 1², 2², 3², 4², maka 5² = 25." },
+    { "q": "Berapakah 2/5 dari 100?", "opts": ["20", "40", "60", "80", "10"], "ans": "40", "exp": "2/5 * 100 = 2 * 20 = 40." },
+    { "q": "Andi beli 3 kg jeruk harga total Rp45.000. Berapa harga 5 kg jeruk?", "opts": ["Rp60.000", "Rp70.000", "Rp75.000", "Rp80.000", "Rp85.000"], "ans": "Rp75.000", "exp": "1 kg = 45.000 / 3 = 15.000. 5 kg = 15.000 * 5 = 75.000." },
+    { "q": "Jika r=7, luas lingkaran adalah ... (phi=22/7)", "opts": ["44", "88", "154", "22", "14"], "ans": "154", "exp": "L = phi * r² = 22/7 * 7 * 7 = 154." },
+    { "q": "Berapakah rata-rata dari 10, 20, 30, 40, 50?", "opts": ["25", "30", "35", "40", "45"], "ans": "30", "exp": "(10+20+30+40+50) / 5 = 150 / 5 = 30." },
+    { "q": "30% dari x adalah 60. Berapakah x?", "opts": ["100", "150", "200", "250", "300"], "ans": "200", "exp": "0,3x = 60 -> x = 60 / 0,3 = 200." },
+    { "q": "15, 12, 9, 6, ... Kelanjutan deret tersebut adalah...", "opts": ["5", "4", "3", "2", "1"], "ans": "3", "exp": "Pola pengurangan tetap 3 (15-3=12, dst)." },
+    { "q": "Sebuah kotak berisi 120 bola. 30% bola merah. Berapa jumlah bola merah?", "opts": ["30", "36", "40", "45", "50"], "ans": "36", "exp": "30/100 * 120 = 3 * 12 = 36." },
+    { "q": "Hasil dari √144 + √169 = ...", "opts": ["23", "25", "27", "29", "31"], "ans": "25", "exp": "12 + 13 = 25." },
+    { "q": "Berapakah 1/4 + 1/2?", "opts": ["2/6", "3/4", "1/6", "1/8", "1"], "ans": "3/4", "exp": "1/4 + 2/4 = 3/4." },
+    { "q": "Jika x=5, berapakah 2x² - 10?", "opts": ["15", "40", "50", "90", "10"], "ans": "40", "exp": "2(5²) - 10 = 2(25) - 10 = 50 - 10 = 40." },
+    { "q": "Volume kubus dengan rusuk 5 cm adalah ... cm³.", "opts": ["25", "75", "100", "125", "150"], "ans": "125", "exp": "V = s³ = 5 * 5 * 5 = 125." },
+    { "q": "Uang Budi 2/3 uang Andi. Jika uang Andi Rp90.000, uang Budi adalah...", "opts": ["Rp30.000", "Rp45.000", "Rp60.000", "Rp75.000", "Rp80.000"], "ans": "Rp60.000", "exp": "2/3 * 90.000 = 2 * 30.000 = 60.000." },
+    { "q": "Berapakah 10% dari 50% dari 1000?", "opts": ["5", "10", "25", "50", "100"], "ans": "50", "exp": "10% * (50% * 1000) = 0,1 * 500 = 50." },
+    { "q": "Kecepatan 20 m/s jika dijadikan km/jam adalah...", "opts": ["36", "72", "54", "90", "100"], "ans": "72", "exp": "20 * (3600/1000) = 20 * 3,6 = 72 km/jam." },
+
+    // === BAGIAN 3: ARAH MATA ANGIN & MAP - 20 SOAL ===
+    { "q": "Jika Anda menghadap ke Utara lalu berputar 90 derajat searah jarum jam, Anda menghadap ke...", "opts": ["Barat", "Selatan", "Timur", "Tenggara", "Barat Laut"], "ans": "Timur", "exp": "Putaran 90 derajat searah jarum jam dari Utara adalah Timur." },
+    { "q": "Antara arah Selatan dan Barat adalah arah...", "opts": ["Barat Laut", "Tenggara", "Barat Daya", "Timur Laut", "Utara"], "ans": "Barat Daya", "exp": "Arah di antara Selatan dan Barat disebut Barat Daya." },
+    { "q": "Jika Budi berjalan ke arah Matahari Terbit, ia berjalan ke arah...", "opts": ["Barat", "Utara", "Timur", "Selatan", "Tenggara"], "ans": "Timur", "exp": "Matahari selalu terbit dari arah Timur." },
+    { "q": "Antara Barat dan Utara adalah arah...", "opts": ["Timur Laut", "Barat Laut", "Barat Daya", "Tenggara", "Barat"], "ans": "Barat Laut", "exp": "Titik tengah antara Barat dan Utara adalah Barat Laut." },
+    { "q": "Jika posisi A di sebelah Utara B, maka B berada di sebelah ... A.", "opts": ["Utara", "Selatan", "Timur", "Barat", "Timur Laut"], "ans": "Selatan", "exp": "Lawan dari arah Utara adalah Selatan." },
+    { "q": "Seseorang menghadap Barat, berputar 180 derajat. Ia sekarang menghadap...", "opts": ["Utara", "Selatan", "Timur", "Barat", "Barat Daya"], "ans": "Timur", "exp": "Putaran 180 derajat selalu menghasilkan arah yang berlawanan. Lawan Barat adalah Timur." },
+    { "q": "Arah jam 12 pada jam analog jika menghadap Utara menunjukkan Utara. Arah jam 3 menunjukkan...", "opts": ["Barat", "Selatan", "Timur", "Utara", "Barat Daya"], "ans": "Timur", "exp": "Jam 3 adalah 90 derajat searah jarum jam dari jam 12 (Utara), maka hasilnya Timur." },
+    { "q": "Jika Anda berjalan ke arah Selatan lalu belok kiri, Anda sekarang berjalan ke arah...", "opts": ["Barat", "Utara", "Timur", "Selatan", "Tenggara"], "ans": "Timur", "exp": "Jika menghadap Selatan, tangan kiri Anda menunjuk ke arah Timur." },
+    { "q": "Arah mata angin di antara Timur dan Selatan adalah...", "opts": ["Barat Laut", "Timur Laut", "Barat Daya", "Tenggara", "Utara"], "ans": "Tenggara", "exp": "Titik antara Timur dan Selatan adalah Tenggara." },
+    { "q": "Jika kompas menunjuk ke atas sebagai Utara, arah kanan bawah menunjukkan...", "opts": ["Barat Daya", "Tenggara", "Timur Laut", "Barat Laut", "Timur"], "ans": "Tenggara", "exp": "Kanan bawah pada kompas standar adalah Tenggara." },
+    { "q": "Anda berjalan ke Timur 5 km, lalu ke Utara 12 km. Jarak lurus dari titik awal adalah...", "opts": ["13 km", "17 km", "7 km", "15 km", "10 km"], "ans": "13 km", "exp": "√(5² + 12²) = √(25 + 144) = √169 = 13 km." },
+    { "q": "Lawan dari arah Barat Laut adalah...", "opts": ["Timur Laut", "Barat Daya", "Tenggara", "Selatan", "Timur"], "ans": "Tenggara", "exp": "Lawan Barat adalah Timur, lawan Utara adalah Selatan. Maka lawan Barat Laut adalah Tenggara." },
+    { "q": "Jika menghadap Tenggara dan berputar 90 derajat berlawanan jarum jam, Anda menghadap...", "opts": ["Barat Daya", "Timur Laut", "Barat Laut", "Utara", "Timur"], "ans": "Timur Laut", "exp": "Tenggara - 90 derajat CCW = Timur Laut." },
+    { "q": "Jarum jam menunjukkan pukul 09.00. Jika angka 12 menunjukkan Utara, angka 9 menunjukkan...", "opts": ["Timur", "Selatan", "Barat", "Utara", "Tenggara"], "ans": "Barat", "exp": "Angka 9 pada jam berada di sebelah kiri atau arah Barat." },
+    { "q": "Antara arah Utara dan Timur adalah...", "opts": ["Barat Laut", "Timur Laut", "Tenggara", "Barat Daya", "Barat"], "ans": "Timur Laut", "exp": "Arah di antara Utara dan Timur adalah Timur Laut." },
+    { "q": "Seseorang lari ke arah Barat 3 km, lalu ke Selatan 4 km. Jarak dari awal?", "opts": ["5 km", "7 km", "1 km", "10 km", "12 km"], "ans": "5 km", "exp": "Triple Pythagoras 3, 4, 5. Jarak = 5 km." },
+    { "q": "Jika bayangan pohon jatuh ke arah Barat pada pagi hari, Matahari berada di...", "opts": ["Barat", "Timur", "Utara", "Selatan", "Tenggara"], "ans": "Timur", "exp": "Pagi hari matahari di Timur, maka bayangan benda jatuh ke arah Barat." },
+    { "q": "Lawan dari arah Barat Daya adalah...", "opts": ["Tenggara", "Barat Laut", "Timur Laut", "Utara", "Barat"], "ans": "Timur Laut", "exp": "Lawan Barat (Timur) dan Selatan (Utara). Jadi Timur Laut." },
+    { "q": "Jika Anda menghadap Timur dan belok kanan dua kali (setiap belokan 90 derajat), Anda menghadap...", "opts": ["Barat", "Utara", "Selatan", "Timur", "Tenggara"], "ans": "Barat", "exp": "Timur -> belok kanan 1 (Selatan) -> belok kanan 2 (Barat)." },
+    { "q": "Arah mata angin yang berada di posisi 225 derajat (dari Utara=0) adalah...", "opts": ["Barat", "Selatan", "Barat Daya", "Barat Laut", "Timur"], "ans": "Barat Daya", "exp": "Utara(0), Timur(90), Selatan(180), Barat(270). Posisi 225 adalah di antara Selatan dan Barat." },
+
+    // === BAGIAN 4: SILOGISME & LOGIKA UMUM - 20 SOAL ===
+    { "q": "Semua polisi adalah disiplin. Andi adalah seorang polisi. Kesimpulannya...", "opts": ["Andi mungkin disiplin", "Andi pasti disiplin", "Andi tidak disiplin", "Semua polisi adalah Andi", "Andi bukan polisi"], "ans": "Andi pasti disiplin", "exp": "Andi adalah bagian dari himpunan polisi yang semuanya disiplin." },
+    { "q": "Semua bunga indah. Mawar adalah bunga. Maka...", "opts": ["Mawar tidak indah", "Sebagian mawar indah", "Mawar adalah indah", "Bunga adalah mawar", "Tidak dapat disimpulkan"], "ans": "Mawar adalah indah", "exp": "Mawar termasuk kategori bunga, sehingga mewarisi sifat indah." },
+    { "q": "Jika hari hujan, jalanan basah. Hari ini hujan. Kesimpulannya...", "opts": ["Jalanan kering", "Jalanan basah", "Mungkin hujan", "Tidak hujan", "Hari ini cerah"], "ans": "Jalanan basah", "exp": "Menggunakan aturan Modus Ponens: Jika P maka Q; P benar, maka Q benar." },
+    { "q": "Semua kendaraan butuh bahan bakar. Motor adalah kendaraan. Maka...", "opts": ["Motor tidak butuh bensin", "Motor butuh bahan bakar", "Semua motor cepat", "Mobil bukan motor", "Motor butuh ban"], "ans": "Motor butuh bahan bakar", "exp": "Sesuai premis bahwa semua kendaraan (termasuk motor) butuh bahan bakar." },
+    { "q": "Beberapa siswa pintar. Semua yang pintar rajin. Maka...", "opts": ["Semua siswa rajin", "Beberapa siswa rajin", "Siswa tidak pintar", "Semua yang rajin siswa", "Tidak ada siswa rajin"], "ans": "Beberapa siswa rajin", "exp": "Siswa yang pintar tersebut termasuk dalam kategori rajin." },
+    { "q": "Jika Andi rajin, ia naik kelas. Andi tidak naik kelas. Maka...", "opts": ["Andi rajin", "Andi malas", "Andi tidak rajin", "Andi tetap naik kelas", "Andi pintar"], "ans": "Andi tidak rajin", "exp": "Aturan Modus Tollens: Jika P maka Q; Q salah, maka P salah." },
+    { "q": "Semua atlet kuat. Tono bukan atlet. Maka...", "opts": ["Tono tidak kuat", "Tono kuat", "Tono mungkin tidak kuat", "Tono adalah kuat", "Tidak dapat disimpulkan"], "ans": "Tidak dapat disimpulkan", "exp": "Premis hanya bicara tentang atlet. Orang yang bukan atlet tidak dijelaskan kekuatannya." },
+    { "q": "Semua mamalia menyusui. Paus adalah mamalia. Maka...", "opts": ["Paus bertelur", "Paus menyusui", "Paus bukan ikan", "Paus berenang", "Semua yang menyusui paus"], "ans": "Paus menyusui", "exp": "Paus masuk kategori mamalia, jadi pasti menyusui." },
+    { "q": "Beberapa buku tebal. Semua buku tebal berat. Maka...", "opts": ["Beberapa buku berat", "Semua buku berat", "Buku tidak berat", "Buku tipis ringan", "Semua berat buku"], "ans": "Beberapa buku berat", "exp": "Hanya buku yang tebal saja yang dipastikan berat berdasarkan premis." },
+    { "q": "Jika lapar, Budi makan. Budi lapar. Maka...", "opts": ["Budi tidak makan", "Budi kenyang", "Budi makan", "Budi minum", "Budi pergi"], "ans": "Budi makan", "exp": "Modus Ponens sederhana." },
+    { "q": "Semua kucing berkumis. Meong adalah kucing. Maka...", "opts": ["Meong tidak berkumis", "Meong mungkin berkumis", "Meong berkumis", "Semua yang berkumis kucing", "Meong suka ikan"], "ans": "Meong berkumis", "exp": "Logika silogisme standar." },
+    { "q": "Jika lulus tes, Andi senang. Andi tidak senang. Maka...", "opts": ["Andi lulus tes", "Andi tidak lulus tes", "Andi sedih", "Andi ikut tes", "Andi gagal tes"], "ans": "Andi tidak lulus tes", "exp": "Modus Tollens: Penyangkalan akibat berarti penyangkalan sebab." },
+    { "q": "Semua manusia akan mati. Socrates adalah manusia. Maka...", "opts": ["Socrates kekal", "Socrates akan mati", "Manusia adalah Socrates", "Socrates hidup terus", "Tidak mati"], "ans": "Socrates akan mati", "exp": "Socrates termasuk dalam himpunan manusia." },
+    { "q": "Beberapa polisi bertubuh kekar. Semua yang kekar sehat. Maka...", "opts": ["Semua polisi sehat", "Beberapa polisi sehat", "Polri sehat semua", "Tidak ada polisi sehat", "Beberapa sehat polisi"], "ans": "Beberapa polisi sehat", "exp": "Hanya sebagian polisi (yang kekar) yang dipastikan sehat." },
+    { "q": "Jika lampu mati, ruangan gelap. Ruangan terang. Maka...", "opts": ["Lampu mati", "Lampu tidak mati", "Lampu rusak", "Listrik padam", "Ruangan redup"], "ans": "Lampu tidak mati", "exp": "Modus Tollens." },
+    { "q": "Semua buah mengandung vitamin. Apel adalah buah. Maka...", "opts": ["Apel manis", "Apel merah", "Apel mengandung vitamin", "Semua apel manis", "Buah apel vitamin"], "ans": "Apel mengandung vitamin", "exp": "Apel mewarisi sifat buah dalam premis." },
+    { "q": "Semua burung punya sayap. Penguin adalah burung. Maka...", "opts": ["Penguin bisa terbang", "Penguin punya sayap", "Penguin hidup di es", "Penguin bukan burung", "Penguin burung sayap"], "ans": "Penguin punya sayap", "exp": "Walau tidak bisa terbang, penguin tetap punya sayap sesuai premis." },
+    { "q": "Beberapa pelari cepat. Semua pelari kuat. Maka...", "opts": ["Semua yang cepat pelari", "Beberapa pelari cepat dan kuat", "Semua pelari cepat", "Cepat adalah kuat", "Pelari tidak kuat"], "ans": "Beberapa pelari cepat dan kuat", "exp": "Pelari yang cepat tersebut otomatis juga kuat karena 'semua' pelari kuat." },
+    { "q": "Jika rajin olahraga, badan sehat. Budi badan sehat. Maka...", "opts": ["Budi rajin olahraga", "Budi malas", "Tidak dapat disimpulkan", "Budi atlet", "Budi suka lari"], "ans": "Tidak dapat disimpulkan", "exp": "Pernyataan akibat (sehat) tidak otomatis membuktikan sebab tertentu (olahraga)." },
+    { "q": "Semua warga negara punya KTP. Budi adalah warga negara. Maka...", "opts": ["Budi tidak punya KTP", "Budi punya KTP", "KTP milik Budi", "Budi warga baik", "Semua punya KTP warga"], "ans": "Budi punya KTP", "exp": "Silogisme kategori mutlak." }
+];
+    let current = 0;
+    let userAns = new Array(quizData.length).fill(null);
+    let timeLeft = 3600; // 60 Menit
+    let timerInterval;
+
+    // --- SISTEM LOGIN ---
+    function startTest() {
+        const name = document.getElementById('username').value.trim();
+        if(!name) return alert("Silakan masukkan nama Anda!");
+        
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('test-screen').style.display = 'block';
+        
+        render();
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+        if(timeLeft <= 0) { finish(); return; }
+        timeLeft--;
+        let m = Math.floor(timeLeft / 60);
+        let s = timeLeft % 60;
+        document.getElementById('timer').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+    }
+
+    // --- RENDER SOAL ---
+    function render() {
+        const q = quizData[current];
+        document.getElementById('q-num').innerText = `PERTANYAAN ${current + 1} DARI ${quizData.length}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        let html = "";
+        q.opts.forEach((o, i) => {
+            html += `<div class="opt ${userAns[current] === i ? 'selected' : ''}" onclick="pick(${i})">
+                        <b style="margin-right:10px;">${String.fromCharCode(65+i)}.</b> ${o}
+                     </div>`;
+        });
+        document.getElementById('options-container').innerHTML = html;
+
+        // Navigasi
+        let nav = "";
+        quizData.forEach((_, i) => {
+            nav += `<div class="nav-item ${userAns[i] !== null ? 'filled' : ''} ${current === i ? 'active' : ''}" onclick="current=${i};render()">${i+1}</div>`;
+        });
+        document.getElementById('nav-grid').innerHTML = nav;
+    }
+
+    function pick(i) {
+        userAns[current] = i;
+        render();
+        // Auto next
+        setTimeout(() => { if(current < quizData.length-1) { current++; render(); } }, 250);
+    }
+
+    function changeQ(dir) {
+        if(dir === 1 && current < quizData.length-1) current++;
+        else if(dir === -1 && current > 0) current--;
+        render();
+    }
+
+    function confirmFinish() {
+        if(confirm("Apakah Anda yakin ingin menyelesaikan ujian? Jawaban akan langsung dikirim.")) finish();
+    }
+
+    // --- FINISH & INTEGRASI G-SHEET ---
+    function finish() {
+        clearInterval(timerInterval);
+        let benar = 0;
+        let tableRows = "";
+        
+        quizData.forEach((q, i) => {
+            const isCorrect = userAns[i] !== null && q.opts[userAns[i]] === q.ans;
+            if(isCorrect) benar++;
+            
+            tableRows += `<tr>
+                <td align="center"><b>${i+1}</b></td>
+                <td>
+                    <b>Soal:</b> ${q.q}<br>
+                    <span style="color:${isCorrect?'green':'red'}">Jawaban Anda: ${userAns[i]!==null?q.opts[userAns[i]]:'-'}</span><br>
+                    <b>Kunci:</b> <span style="color:green">${q.ans}</span>
+                    <div class="exp-box"><b>Pembahasan:</b> ${q.exp || 'Analisis mandiri materi terkait.'}</div>
+                </td>
+                <td align="center">${isCorrect ? '<b style="color:green">BENAR</b>' : '<b style="color:red">SALAH</b>'}</td>
+            </tr>`;
+        });
+
+        const score = Math.round((benar / quizData.length) * 100);
+        const name = document.getElementById('username').value;
+
+        // KIRIM KE GOOGLE SHEET (Ganti URL di bawah)
+        fetch("https://script.google.com/macros/s/AKfycbxp_LboBzFPWAwYnpIYbzcvXbafmrDSekTmk7PkaRt871LTHPEAt375cGR65pCsT4vw/exec", {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                nama: name,
+                skor: score,
+                kategori: "Kecerdasan",
+                tanggal: new Date().toLocaleString()
+            })
+        });
+
+        document.getElementById('test-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('res-name-display').innerText = name;
+        document.getElementById('score-val').innerText = score;
+        document.getElementById('review-body').innerHTML = tableRows;
+        window.scrollTo(0,0);
+    }
+
+    // --- DOWNLOAD PDF ---
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const nama = document.getElementById('username').value;
+        const score = document.getElementById('score-val').innerText;
+
+        doc.setFontSize(18);
+        doc.text("LAPORAN HASIL CAT KECERDASAN", 105, 15, { align: "center" });
+        doc.setFontSize(11);
+        doc.text("Persona Research & Consulting", 105, 22, { align: "center" });
+        doc.line(15, 25, 195, 25);
+
+        doc.text(`Nama Lengkap : ${nama}`, 15, 35);
+        doc.text(`Skor Akhir    : ${score} / 100`, 15, 42);
+        doc.text(`Tanggal Tes   : ${new Date().toLocaleDateString('id-ID')}`, 15, 49);
+
+        const rows = quizData.map((q, i) => {
+            const isCorrect = userAns[i] !== null && q.opts[userAns[i]] === q.ans;
+            return [
+                i + 1,
+                `Soal: ${q.q}\nJawaban: ${userAns[i]!==null?q.opts[userAns[i]]:'-'}\nKunci: ${q.ans}\nPembahasan: ${q.exp}`,
+                isCorrect ? "BENAR" : "SALAH"
+            ];
+        });
+
+        doc.autoTable({
+            startY: 55,
+            head: [['No', 'Detail Soal & Pembahasan', 'Status']],
+            body: rows,
+            theme: 'grid',
+            headStyles: { fillColor: [26, 26, 46] },
+            styles: { fontSize: 8, cellPadding: 3 },
+            columnStyles: { 1: { cellWidth: 140 } }
+        });
+
+        doc.save(`Hasil_CAT_${nama}.pdf`);
+    }
+</script>
+</body>
+</html>
